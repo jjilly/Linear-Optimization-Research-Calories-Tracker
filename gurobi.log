@@ -58,3 +58,132 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
 
 Solved in 0 iterations and 0.00 seconds
 Optimal objective  9.412680024e+00
+
+Gurobi 8.0.1 (mac64, Python) logging started Mon Oct 29 15:13:11 2018
+
+Optimize a model with 4 rows, 11 columns and 37 nonzeros
+Coefficient statistics:
+  Matrix range     [1e+00, 6e+02]
+  Objective range  [9e-01, 3e+00]
+  Bounds range     [6e+01, 4e+02]
+  RHS range        [6e+01, 2e+03]
+Presolve removed 0 rows and 1 columns
+Presolve time: 0.01s
+Presolved: 4 rows, 10 columns, 36 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    0.0000000e+00   1.180000e+02   0.000000e+00      0s
+       5    9.4126800e+00   0.000000e+00   0.000000e+00      0s
+
+Solved in 5 iterations and 0.02 seconds
+Optimal objective  9.412680024e+00
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 15:12:22 2018
+
+Optimize a model with 4 rows, 11 columns and 37 nonzeros
+Coefficient statistics:
+  Matrix range     [1e+00, 6e+02]
+  Objective range  [9e-01, 3e+00]
+  Bounds range     [6e+01, 4e+02]
+  RHS range        [6e+01, 2e+03]
+Presolve removed 0 rows and 1 columns
+Presolve time: 0.01s
+Presolved: 4 rows, 10 columns, 36 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    0.0000000e+00   1.180000e+02   0.000000e+00      0s
+       5    9.4126800e+00   0.000000e+00   0.000000e+00      0s
+
+Solved in 5 iterations and 0.02 seconds
+Optimal objective  9.412680024e+00
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 15:18:18 2018
+
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 15:55:30 2018
+
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 16:03:55 2018
+
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 16:05:42 2018
+
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 16:06:42 2018
+
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 16:07:30 2018
+
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 16:09:26 2018
+
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 16:09:54 2018
+
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 16:10:39 2018
+
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 16:14:50 2018
+
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 16:16:04 2018
+
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 16:17:05 2018
+
+Error: it isn't a multi-objective model
+Error: it isn't a multi-objective model
+Error: it isn't a multi-objective model
+Error: it isn't a multi-objective model
+Error: it isn't a multi-objective model
+No solution available
+Error: it isn't a multi-objective model
+No solution available
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 16:19:22 2018
+
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 16:22:26 2018
+
+
+Gurobi 8.0.1 (mac64, Python) logging started Fri Nov 16 16:25:24 2018
+
+Optimize a model with 4 rows, 11 columns and 37 nonzeros
+Model has 9 quadratic objective terms
+Coefficient statistics:
+  Matrix range     [1e+00, 6e+02]
+  Objective range  [0e+00, 0e+00]
+  QObjective range [2e+00, 6e+00]
+  Bounds range     [6e+01, 4e+02]
+  RHS range        [6e+01, 2e+03]
+Presolve removed 0 rows and 1 columns
+Presolve time: 0.01s
+Presolved: 4 rows, 10 columns, 36 nonzeros
+Presolved model has 9 quadratic objective terms
+Ordering time: 0.00s
+
+Barrier statistics:
+ AA' NZ     : 6.000e+00
+ Factor NZ  : 1.000e+01
+ Factor Ops : 3.000e+01 (less than 1 second per iteration)
+ Threads    : 1
+
+                  Objective                Residual
+Iter       Primal          Dual         Primal    Dual     Compl     Time
+   0   2.59339714e+06 -2.59417839e+06  3.37e+03 0.00e+00  1.00e+06     0s
+   1   2.95272138e+05 -3.02575865e+05  7.03e+02 1.14e-13  1.96e+05     0s
+   2   4.66829066e+03 -2.17797133e+04  4.61e+01 5.46e-12  1.89e+04     0s
+   3   1.06172012e+02 -1.53429547e+04  1.28e+00 0.00e+00  1.53e+03     0s
+   4   8.97193305e+01 -3.40817417e+03  3.92e-04 0.00e+00  2.50e+02     0s
+   5   3.21015413e+01 -5.39507055e+02  3.92e-10 1.14e-13  4.08e+01     0s
+   6   1.58564989e+01 -1.24095743e+01  6.68e-12 0.00e+00  2.02e+00     0s
+   7   8.95357495e+00  2.15697942e+00  0.00e+00 1.22e-15  4.85e-01     0s
+   8   7.69680625e+00  6.88184194e+00  8.88e-16 7.77e-16  5.82e-02     0s
+   9   7.56892183e+00  7.55320814e+00  8.88e-16 4.44e-16  1.12e-03     0s
+  10   7.56722531e+00  7.56719773e+00  0.00e+00 1.78e-15  1.97e-06     0s
+  11   7.56722372e+00  7.56722369e+00  0.00e+00 7.77e-16  1.97e-09     0s
+
+Barrier solved model in 11 iterations and 0.01 seconds
+Optimal objective 7.56722372e+00
+

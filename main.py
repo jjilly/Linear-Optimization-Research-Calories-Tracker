@@ -72,6 +72,9 @@ m = Model("diet")
 
 # Create decision variables for the foods to buy
 buy = m.addVars(foods, name="buy")
+penalized_objective = QuadExpr();
+for food, price in zip(buy.select(), cost.select()):
+  penalized_objective.add(price*food*food)
 
 # You could use Python looping constructs and m.addVar() to create
 # these decision variables instead.  The following would be equivalent
@@ -81,7 +84,10 @@ buy = m.addVars(foods, name="buy")
 #   buy[f] = m.addVar(name=f)
 
 # The objective is to minimize the costs
-m.setObjective(buy.prod(cost), GRB.MINIMIZE)
+#1: To set to normal objective function with no penalization
+#m.setObjective(buy.prod(cost), GRB.MINIMIZE)
+#2: To set to food amount penalized objective
+m.setObjective(penalized_objective, GRB.MINIMIZE)
 
 # Using looping constructs, the preceding statement would be:
 #

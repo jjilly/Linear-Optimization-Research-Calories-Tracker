@@ -28,6 +28,26 @@ foods, cost = multidict({
   'milk':      0.89,
   'ice cream': 1.59})
 
+foods, cost_multiplier = multidict({
+  'hamburger': 1,
+  'chicken':   math.sin,
+  'hot dog':   1,
+  'fries':     1,
+  'macaroni':  1,
+  'pizza':     1,
+  'salad':     math.sin,
+  'milk':      1,
+  'ice cream': 1})
+
+
+def function_cost(x=0):
+  for food_name in list(cost):
+    multiplier=cost_multiplier[food_name]
+    if callable(multiplier):
+      cost[food_name] = cost[food_name] * multiplier(x)
+    else:
+      cost[food_name] = cost[food_name] * multiplier
+
 # Nutrition values for the foods
 nutritionValues = {
   ('hamburger', 'calories'): 410,
@@ -72,16 +92,10 @@ m = Model("diet")
 
 # Create decision variables for the foods to buy
 buy = m.addVars(foods, name="buy")
-penalized_objective = QuadExpr();
+penalized_objective = QuadExpr()
+function_cost(x=3)
 for food, price in zip(buy.select(), cost.select()):
   penalized_objective.add(price*food*food)
-
-# You could use Python looping constructs and m.addVar() to create
-# these decision variables instead.  The following would be equivalent
-#
-# buy = {}
-# for f in foods:
-#   buy[f] = m.addVar(name=f)
 
 # The objective is to minimize the costs
 #1: To set to normal objective function with no penalization
@@ -99,19 +113,13 @@ m.addConstrs(
     	== [minNutrition[c], maxNutrition[c]]
      for c in categories), "_")
 
-# Using looping constructs, the preceding statement would be:
-#
-# for c in categories:
-#  m.addRange(
-#     sum(nutritionValues[f,c] * buy[f] for f in foods), minNutrition[c], maxNutrition[c], c)
-
 def printSolution():
     if m.status == GRB.Status.OPTIMAL:
         print('\nCost: %g' % m.objVal)
         print('\nBuy:')
         buyx = m.getAttr('x', buy)
         for f in foods:
-            if buy[f].x > 0.0001:
+            if buy[f].x > 0.01:
                 print('%s %g' % (f, buyx[f]))
     else:
         print('No solution')
@@ -119,10 +127,3 @@ def printSolution():
 # Solve
 m.optimize()
 printSolution()
-
-# print('\nAdding constraint: at most 6 servings of dairy')
-# m.addConstr(buy.sum(['milk','ice cream']) <= 6, "limit_dairy")
-#
-# # Solve
-# m.optimize()
-# printSolution()

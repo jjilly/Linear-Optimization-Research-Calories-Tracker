@@ -1,9 +1,5 @@
 #!/usr/bin/python
-
-# Copyright 2018, Gurobi Optimization, LLC
-
-# Solve the classic diet model, showing how to add constraints
-# to an existing model.
+import argparse
 
 from gurobipy import *
 
@@ -17,59 +13,59 @@ categories, minNutrition, maxNutrition = multidict({
   'fat':      [0, 65],
   'carbohydrates':   [130, GRB.INFINITY] })
 
-foods, cost = multidict({
-  'hamburger': 2.49,
+foods, costs = multidict({
+  'meatball': 2.49,
   'chicken':   2.89,
-  'hot dog':   1.50,
-  'fries':     1.89,
-  'macaroni':  2.09,
+  'meat pie':   1.50,
+  'potatoes':     1.89,
+  'pasta':  2.09,
   'pizza':     1.99,
   'salad':     2.49,
   'milk':      0.89,
   'ice cream': 1.59})
 
-foods, cost_multiplier = multidict({
-  'hamburger': 1,
-  'chicken':   math.sin,
-  'hot dog':   1,
-  'fries':     1,
-  'macaroni':  1,
-  'pizza':     1,
-  'salad':     math.sin,
-  'milk':      1,
+foods, costs_multiplier = multidict({
+  'meatball': 1,
+  'chicken': math.sin,
+  'meat pie': 1,
+  'potatoes': 1,
+  'pasta': 1,
+  'pizza': 1,
+  'salad': lambda x: math.sin(x),
+  'milk': 1,
   'ice cream': 1})
 
 
-def function_cost(x=0):
-  for food_name in list(cost):
-    multiplier=cost_multiplier[food_name]
+def function_costs(time=0):
+  for food_name in list(costs):
+    multiplier=costs_multiplier[food_name]
     if callable(multiplier):
-      cost[food_name] = cost[food_name] * multiplier(x)
+      costs[food_name] = costs[food_name] * multiplier(time)
     else:
-      cost[food_name] = cost[food_name] * multiplier
+      costs[food_name] = costs[food_name] * multiplier
 
 # Nutrition values for the foods
 nutritionValues = {
-  ('hamburger', 'calories'): 410,
-  ('hamburger', 'protein'):  24,
-  ('hamburger', 'fat'):      26,
-  ('hamburger', 'carbohydrates'):   40,
+  ('meatball', 'calories'): 410,
+  ('meatball', 'protein'):  24,
+  ('meatball', 'fat'):      26,
+  ('meatball', 'carbohydrates'):   40,
   ('chicken',   'calories'): 420,
   ('chicken',   'protein'):  32,
   ('chicken',   'fat'):      10,
   ('chicken',   'carbohydrates'):   0,
-  ('hot dog',   'calories'): 560,
-  ('hot dog',   'protein'):  20,
-  ('hot dog',   'fat'):      32,
-  ('hot dog',   'carbohydrates'):   45,
-  ('fries',     'calories'): 380,
-  ('fries',     'protein'):  4,
-  ('fries',     'fat'):      19,
-  ('fries',     'carbohydrates'):   39,
-  ('macaroni',  'calories'): 320,
-  ('macaroni',  'protein'):  12,
-  ('macaroni',  'fat'):      10,
-  ('macaroni',  'carbohydrates'):   75,
+  ('meat pie',   'calories'): 560,
+  ('meat pie',   'protein'):  20,
+  ('meat pie',   'fat'):      32,
+  ('meat pie',   'carbohydrates'):   45,
+  ('potatoes',     'calories'): 380,
+  ('potatoes',     'protein'):  4,
+  ('potatoes',     'fat'):      19,
+  ('potatoes',     'carbohydrates'):   39,
+  ('pasta',  'calories'): 320,
+  ('pasta',  'protein'):  12,
+  ('pasta',  'fat'):      10,
+  ('pasta',  'carbohydrates'):   75,
   ('pizza',     'calories'): 320,
   ('pizza',     'protein'):  15,
   ('pizza',     'fat'):      12,
@@ -87,25 +83,36 @@ nutritionValues = {
   ('ice cream', 'fat'):      10,
   ('ice cream', 'carbohydrates'):   32}
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-p', '--penalty', required=False)
+parser.add_argument('-w', '--weighted', required=False)
+
+io_args = parser.parse_args()
+penalty = io_args.penalty
+weighted = io_args.weighted
+
 # Model
 m = Model("diet")
 
 # Create decision variables for the foods to buy
 buy = m.addVars(foods, name="buy")
-penalized_objective = QuadExpr()
-function_cost(x=3)
-for food, price in zip(buy.select(), cost.select()):
-  penalized_objective.add(price*food*food)
+
+if weighted == "yes":
+  function_costs(time=3)
 
 # The objective is to minimize the costs
-#1: To set to normal objective function with no penalization
-#m.setObjective(buy.prod(cost), GRB.MINIMIZE)
-#2: To set to food amount penalized objective
-m.setObjective(penalized_objective, GRB.MINIMIZE)
+if penalty == "none":
+  # 2: To set to normal objective function with no penalization
+  m.setObjective(buy.prod(costs), GRB.MINIMIZE)
+elif penalty == "quadratic":
+  penalized_objective = QuadExpr()
 
-# Using looping constructs, the preceding statement would be:
-#
-# m.setObjective(sum(buy[f]*cost[f] for f in foods), GRB.MINIMIZE)
+  for food, price in zip(buy.select(), costs.select()):
+    penalized_objective.add(price * food + (.5) * food * food)
+  # 2: To set to food amount penalized objective
+  m.setObjective(penalized_objective, GRB.MINIMIZE)
+else:
+  m.setObjective(buy.prod(costs), GRB.MINIMIZE)
 
 # Nutrition constraints
 m.addConstrs(
@@ -115,12 +122,18 @@ m.addConstrs(
 
 def printSolution():
     if m.status == GRB.Status.OPTIMAL:
-        print('\nCost: %g' % m.objVal)
-        print('\nBuy:')
+        print('\nOptimal Solution: %g' % m.objVal)
+        print('\nTO BUY (in grams):')
         buyx = m.getAttr('x', buy)
+        cost = 0
         for f in foods:
             if buy[f].x > 0.01:
                 print('%s %g' % (f, buyx[f]))
+                cost += buyx[f] * costs[f]
+
+        print('\nCost of chicken: %g' % costs["chicken"])
+        print('Cost of salad: %g' % costs["salad"])
+        print('\nMinimum cost: %g' % cost)
     else:
         print('No solution')
 

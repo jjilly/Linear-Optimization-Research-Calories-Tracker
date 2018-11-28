@@ -8,12 +8,18 @@ from gurobipy import *
 # https://www.myfitnesspal.com/
 # Accessed: 2018-11-28
 
+# Nutritional food price base on:
+# Real Canadian Superstore
+# https://www.realcanadiansuperstore.ca/
+# Accessed: 2018-11-28
+
 categories, minNutrition, maxNutrition = multidict({
   'calories': [1800, 2200],
   'protein':  [91, GRB.INFINITY],
   'fat':      [0, 65],
   'carbohydrates':   [130, GRB.INFINITY] })
 
+# per serving cost:
 foods, costs = multidict({
   'meatball': 2.49,
   'chicken': 2.89,
@@ -25,6 +31,7 @@ foods, costs = multidict({
   'milk': 0.89,
   'ice cream': 1.59})
 
+# per serving nutrition:
 foods, costs_multiplier = multidict({
   'meatball': 1,
   'chicken': math.sin,

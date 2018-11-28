@@ -4,7 +4,9 @@ import argparse
 from gurobipy import *
 
 # Nutritional food information base on:
-# USDA Dietary Guidelines
+# MyFitnessPal open source nutritional database
+# https://www.myfitnesspal.com/
+# Accessed: 2018-11-28
 
 categories, minNutrition, maxNutrition = multidict({
   'calories': [1800, 2200],

@@ -14,6 +14,11 @@ from datetime import datetime
 # https://www.realcanadiansuperstore.ca/
 # Accessed: 2018-11-28
 
+
+# To run scripts:
+# main.py -p <penalization: quadratic or none> -w <weighted: yes or no>
+# (ex. "main.py -p qudratic -w yes")
+
 categories, minNutrition, maxNutrition = multidict({
   'calories': [1800, 2200],
   'protein':  [91, GRB.INFINITY],
@@ -78,7 +83,7 @@ foods, costs_multiplier = multidict({
   'potatoes': 1,
   'pasta': 1,
   'pizza': 1,
-  'salad': lambda x: math.sin(x) + 1,
+  'salad': lambda x: 1 + math.sin(x),
   'milk': 1,
   'ice cream': 1})
 

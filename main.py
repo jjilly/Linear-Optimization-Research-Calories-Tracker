@@ -2,6 +2,7 @@
 import argparse
 
 from gurobipy import *
+from datetime import datetime
 
 # Nutritional food information base on:
 # MyFitnessPal open source nutritional database
@@ -19,7 +20,7 @@ categories, minNutrition, maxNutrition = multidict({
   'fat':      [0, 65],
   'carbohydrates':   [130, GRB.INFINITY] })
 
-# per serving cost:
+# per serving cost in Canadian Dollars:
 foods, costs = multidict({
   'meatball': 2.49,
   'chicken': 2.89,
@@ -31,28 +32,7 @@ foods, costs = multidict({
   'milk': 0.89,
   'ice cream': 1.59})
 
-# per serving nutrition:
-foods, costs_multiplier = multidict({
-  'meatball': 1,
-  'chicken': math.sin,
-  'meat pie': 1,
-  'potatoes': 1,
-  'pasta': 1,
-  'pizza': 1,
-  'salad': lambda x: math.sin(x),
-  'milk': 1,
-  'ice cream': 1})
-
-
-def function_costs(time=0):
-  for food_name in list(costs):
-    multiplier=costs_multiplier[food_name]
-    if callable(multiplier):
-      costs[food_name] = costs[food_name] * multiplier(time)
-    else:
-      costs[food_name] = costs[food_name] * multiplier
-
-# Nutrition values for the foods
+# Per serving nutrition:
 nutritionValues = {
   ('meatball', 'calories'): 410,
   ('meatball', 'protein'): 24,
@@ -91,6 +71,25 @@ nutritionValues = {
   ('ice cream', 'fat'): 10,
   ('ice cream', 'carbohydrates'): 32}
 
+foods, costs_multiplier = multidict({
+  'meatball': 1,
+  'chicken': lambda x: 1 + math.sin(x),
+  'meat pie': 1,
+  'potatoes': 1,
+  'pasta': 1,
+  'pizza': 1,
+  'salad': lambda x: math.sin(x) + 1,
+  'milk': 1,
+  'ice cream': 1})
+
+def function_costs(time=0):
+    for food_name in list(costs):
+        multiplier=costs_multiplier[food_name]
+        if callable(multiplier):
+            costs[food_name] = costs[food_name] * multiplier(time)
+        else:
+            costs[food_name] = costs[food_name] * multiplier
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-p', '--penalty', required=False)
 parser.add_argument('-w', '--weighted', required=False)
@@ -106,25 +105,27 @@ m = Model("diet")
 buy = m.addVars(foods, name="buy")
 
 if weighted == "yes":
-  function_costs(time=3)
+    #finds day in the year (e.g. if Jan 2 -> 2)
+    day_of_year = datetime.now().timetuple().tm_yday
+    function_costs(time=(day_of_year/365.0)*2*math.pi)
 
 # The objective is to minimize the costs
 if penalty == "none":
-  # 2: To set to normal objective function with no penalization
-  m.setObjective(buy.prod(costs), GRB.MINIMIZE)
+    # 1: To set to normal objective function with no penalization
+    m.setObjective(buy.prod(costs), GRB.MINIMIZE)
 elif penalty == "quadratic":
-  penalized_objective = QuadExpr()
-  for food, price in zip(buy.select(), costs.select()):
-    penalized_objective.add(price * food + (.5) * food * food)
-  # 2: To set to food amount penalized objective
-  m.setObjective(penalized_objective, GRB.MINIMIZE)
+    penalized_objective = QuadExpr()
+    for food, price in zip(buy.select(), costs.select()):
+        penalized_objective.add(price * food + (.5) * food * food)
+    # 2: To set to food amount penalized objective
+    m.setObjective(penalized_objective, GRB.MINIMIZE)
 else:
-  m.setObjective(buy.prod(costs), GRB.MINIMIZE)
+    m.setObjective(buy.prod(costs), GRB.MINIMIZE)
 
 # Nutrition constraints
 m.addConstrs(
     (quicksum(nutritionValues[f,c] * buy[f] for f in foods)
-    	== [minNutrition[c], maxNutrition[c]]
+        == [minNutrition[c], maxNutrition[c]]
      for c in categories), "_")
 
 def printSolution():
@@ -143,6 +144,8 @@ def printSolution():
         print('\nMinimum cost: %g' % cost)
     else:
         print('No solution')
+
+    print(m.X)
 
 # Solve
 m.optimize()
